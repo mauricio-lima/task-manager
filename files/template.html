@@ -19,13 +19,13 @@
                 </div>
                 <template id="task-row">                
                     <tr>
-                        <th scope="row">3</th>
-                        <td>Tarefa 5     </td>
-                        <td>Descrição 5  </td>
-                        <td>01/05/2018   </td>
-                        <td>01/06/2018   </td>
-                        <td>Em Teste     </td>
-                        <td>Ativo        </td>
+                        <th scope="row">{sequence}</th>
+                        <td>{name}       </td>
+                        <td>{description}</td>
+                        <td>{start}      </td>
+                        <td>{finish}     </td>
+                        <td>{status}     </td>
+                        <td>{state}      </td>
                         <td><button type="button" class="btn btn-primary btn-rounded btn-sm my-0">Editar</button></td>
                     </tr>
                 </template>
@@ -42,36 +42,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>Tarefa 2     </td>
-                            <td>Descrição 2  </td>
-                            <td>01/02/2018   </td>
-                            <td>01/03/2018   </td>
-                            <td>Pendente     </td>
-                            <td>Ativo        </td>                                                                                    
-                            <td><button type="button" class="btn btn-primary btn-rounded btn-sm my-0">Editar</button></td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Tarefa 2     </td>
-                            <td>Descrição 2  </td>
-                            <td>01/02/2018   </td>
-                            <td>01/03/2018   </td>
-                            <td>Em Desenvolvimento</td>
-                            <td>Ativo        </td>
-                            <td><button type="button" class="btn btn-primary btn-rounded btn-sm my-0">Editar</button></td>                            
-                        </tr>
-                        <tr>
-                            <th scope="row">3</th>
-                            <td>Tarefa 3     </td>
-                            <td>Descrição 3  </td>
-                            <td>01/02/2018   </td>
-                            <td>01/03/2018   </td>
-                            <td>Em Teste     </td>
-                            <td>Ativo        </td>
-                            <td><button type="button" class="btn btn-primary btn-rounded btn-sm my-0">Editar</button></td>
-                        </tr>
                     </tbody>
                 </table>
             </div>        
