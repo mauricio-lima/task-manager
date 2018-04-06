@@ -33,7 +33,9 @@
 
     function getData()
     {
-        $.get('static.php', UpdateData)
+        $.get('tasks.php')
+           .done(UpdateData)
+           .fail(function() { alert("ajax error") })
     }
  }
 )()
