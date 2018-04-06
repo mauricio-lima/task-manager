@@ -2,6 +2,10 @@
  {
     $(function() {      
         getData()
+        $('#add').click(TasksAdd)
+
+        $('#task-dialog > div .modal-footer .btn-success').click(TaskDialogConfirmation)
+
         $(document).keydown(function (event) { 
             if (event.ctrlKey)
             {
@@ -10,8 +14,8 @@
                     $('.table tbody').append($("#task-row").html())
                 }
             } 
-                            })
-      })
+        })
+    })
 
     function UpdateData(data)
     {
@@ -29,6 +33,17 @@
 
             $('.table tbody').append(template)
         })
+    }
+
+    function TasksAdd()
+    {
+        $('#task-dialog').modal('show')
+
+    }
+
+    function TaskDialogConfirmation()
+    {
+        alert('Task Dialog Confirmation \n\n' + $('#task-name').val() + '\n' + $('#task-description').val() + '\n' + $('#task-start').val() + '\n' + $('#task-finish').val())
     }
 
     function getData()
