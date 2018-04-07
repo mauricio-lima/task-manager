@@ -144,6 +144,3 @@ function request_select()
 request_select();
 
 ?>
-get_data();
-
-?>
