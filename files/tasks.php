@@ -37,7 +37,7 @@ function get_tasks_data()
 {
     $database = database_connection();
 
-    $statment = $database->prepare('select task_id, name, description, start, finish, status, active as state from tasks', array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+    $statment = $database->prepare('call tasks_list', array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
     $statment->execute();
 
     $result = $statment->fetchAll(PDO::FETCH_ASSOC);
@@ -48,15 +48,23 @@ function get_tasks_data()
 }
 
 
-function insert_task_data()
+function insert_task_data($data)
 {
     $database = database_connection();
 
-    $statment = $database->prepare('call task_insert(:name, :description, :start, :finish, :status, :active)', array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-    $statment->execute([':name' => 'aaaa', ':description' => 'bbbb', ':start' => '2018-01-01', ':finish' => '2018-01-01', ':status' => 1, ':active' => 1]);
+    $statment = $database->prepare('call task_insert(:name, :description, :start, :finish, :status, :active, @json)', array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+    $statment->bindValue(':name',        $data['name'],        PDO::PARAM_STR);
+    $statment->bindValue(':description', $data['description'], PDO::PARAM_STR);
+    $statment->bindValue(':start',       $data['start'],       PDO::PARAM_STR);
+    $statment->bindValue(':finish',      $data['finish'],      PDO::PARAM_STR);
+    $statment->bindValue(':status',       1,           PDO::PARAM_INT);
+    $statment->bindValue(':active',       1,           PDO::PARAM_INT);
+    $statment->execute();
+
+    $json = $database->query('select @json')->fetchAll(PDO::FETCH_ASSOC)[0]['@json'];
 
     header('Content-type: application/json');
-    print_r('{ "success" : true }');
+    print($json);
 }
 
 
@@ -81,19 +89,14 @@ function request_select()
               $method = 'post';
               if ( isset($_SERVER['CONTENT_TYPE']) )
               {
-                switch ($_SERVER['CONTENT_TYPE'])
+                if ( strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false )
                 {
-                    case 'application/x-www-form-urlencoded':
-                        $parameters = normalize_parameters($_POST);
-                        break;
-
-                    case 'application/json':
-                        $a = file_get_contents('php://input');
-                        $parameters = json_decode(file_get_contents('php://input'), true);
-                        break;
-
-                    default:
-                        break;
+                    $parameters = json_decode(file_get_contents('php://input'), true);
+                    if (json_last_error() != JSON_ERROR_NONE)
+                    {
+                        http_response_code(402);
+                        throw new Exception('Invalid JSON');                            
+                    }
                 }
               }
               break;
@@ -111,7 +114,7 @@ function request_select()
 
       if ( ($method == 'post') && !isset($parameters['action']) )
       {
-          throw new Exception('Missing \'action\' in post \n' . $_SERVER['CONTENT_TYPE'] . '\n' . $a . '\n' . print_r($parameters, true));
+          throw new Exception('Missing \'action\' in post \n' . $_SERVER['CONTENT_TYPE'] . print_r($parameters, true));
           return;
       }
 
@@ -123,13 +126,13 @@ function request_select()
 
       if ( ($method == 'post')  )
       {
-        if ( $parameters['action'] != 'insert')
+        if ( $parameters['action'] == 'insert')
         {
-            throw new Exception('Only action allowed is \'insert\'');
+            insert_task_data($parameters['data']);
             return;
         }
 
-        insert_task_data($parameters['data']);
+        throw new Exception('action ' . $parameters['action'] . ' not allowed.');
         return;
       }
   }
