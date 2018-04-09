@@ -3,33 +3,22 @@
 require('database.php');
 
 
-function error_handler($message)
+class RequestException extends Exception
 {
-  $log = (new DateTime())->format('Y-m-d H:i:s') . '  ' . $message . PHP_EOL;
-  file_put_contents('errorlog', $log, FILE_APPEND | LOCK_EX);
-
-  http_response_code(500);
-  header('Content-type: application/json');
-  print('{ "code" : 500, "message" : "' . $message . '" }');
-  die();
+    public function __construct($code = 0, $message, Exception $previous = null) {
+        parent::__construct($message, $code, $previous);
+    }
 }
 
 
 function database_connection()
 {
-    try
-    {
-        $database = null;
-        $database = new PDO('mysql:host=localhost; dbname=' . Database::NAME . '; charset=utf8', Database::USER, Database::PASSWORD);
-        $database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $database->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+    $database = null;
+    $database = new PDO('mysql:host=localhost; dbname=' . Database::NAME . '; charset=utf8', Database::USER, Database::PASSWORD);
+    $database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $database->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 
-        return $database;
-    }
-    catch(Exception $e)
-    {
-        error_handler($e->getMessage());
-    }
+    return $database;
 }
 
 
@@ -70,19 +59,17 @@ function insert_task_data($data)
 
 function normalize_parameters($source)
 {
-  $parameters = array();
-  foreach ($source as $key => $value) 
-  { 
-    $parameters[strtolower($key)] = $value;
-  }
-  return $parameters;
+    $parameters = array();
+    foreach ($source as $key => $value) 
+    { 
+        $parameters[strtolower($key)] = $value;
+    }
+    return $parameters;
 }
 
 
 function request_select()
 {
-  try
-  {
       switch ($_SERVER['REQUEST_METHOD'])
       {
           case 'POST' :
@@ -95,7 +82,7 @@ function request_select()
                     if (json_last_error() != JSON_ERROR_NONE)
                     {
                         http_response_code(402);
-                        throw new Exception('Invalid JSON');                            
+                        throw new RequestException(406, 'Invalid JSON');                            
                     }
                 }
               }
@@ -107,14 +94,13 @@ function request_select()
               break;
 
           default :
-              http_response_code(405);
-              throw new Exception('Method \'' . $_SERVER['REQUEST_METHOD'] . '\' not supported');
+              throw new Exception(405, 'Method \'' . $_SERVER['REQUEST_METHOD'] . '\' not supported');
               return;        
       }
 
       if ( ($method == 'post') && !isset($parameters['action']) )
       {
-          throw new Exception('Missing \'action\' in post \n' . $_SERVER['CONTENT_TYPE'] . print_r($parameters, true));
+          throw new RequestException(406, 'Missing \'action\' in post \n' . $_SERVER['CONTENT_TYPE'] . print_r($parameters, true));
           return;
       }
 
@@ -132,18 +118,36 @@ function request_select()
             return;
         }
 
-        throw new Exception('action ' . $parameters['action'] . ' not allowed.');
+        throw new RequestException(406, 'action ' . $parameters['action'] . ' not allowed.');
         return;
       }
-  }
-  catch (Exception $e)
-  {
-      error_handler($e->getMessage() . '[' . $e->getLine() .']');
-  }
-
 }
 
 
-request_select();
+function error_handler($message, $line, $code)
+{
+    $log = (new DateTime())->format('Y-m-d H:i:s') . '  ' . $message . '[' . $line .']' . PHP_EOL;
+    file_put_contents('errorlog', $log, FILE_APPEND | LOCK_EX);
+
+    header('Content-type: application/json');
+    print('{ "code" : ' . $code . ', "message" : "' . $message . '" }');
+    die();
+}
+
+
+try
+{
+    request_select();
+}
+catch (RequestException $e)
+{
+    http_response_code($e->getCode());  
+    error_handler($e->getMessage(), $e->getLine(), $e->getCode());
+}
+catch (Exception $e)
+{
+    http_response_code(500);
+    error_handler($e->getMessage(), $e->getLine(), $e->getCode());
+}
 
 ?>
