@@ -54,7 +54,22 @@ function tasks_list()
 
 function task_update($data)
 {
+    $database = database_connection();
 
+    $statment = $database->prepare('call task_update(:task_id, :name, :description, :start, :finish, :status, :active, @json)', array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+    $statment->bindValue(':task_id',     $data['task_id'],     PDO::PARAM_STR);
+    $statment->bindValue(':name',        $data['name'],        PDO::PARAM_STR);
+    $statment->bindValue(':description', $data['description'], PDO::PARAM_STR);
+    $statment->bindValue(':start',       $data['start'],       PDO::PARAM_STR);
+    $statment->bindValue(':finish',      $data['finish'],      PDO::PARAM_STR);
+    $statment->bindValue(':status',      $data['status'],      PDO::PARAM_INT);
+    $statment->bindValue(':active',       1,                   PDO::PARAM_INT);
+    $statment->execute();
+
+    $json = $database->query('select @json')->fetchAll(PDO::FETCH_ASSOC)[0]['@json'];
+
+    header('Content-type: application/json');
+    print($json);
 }
 
 
@@ -67,8 +82,8 @@ function task_insert($data)
     $statment->bindValue(':description', $data['description'], PDO::PARAM_STR);
     $statment->bindValue(':start',       $data['start'],       PDO::PARAM_STR);
     $statment->bindValue(':finish',      $data['finish'],      PDO::PARAM_STR);
-    $statment->bindValue(':status',       1,           PDO::PARAM_INT);
-    $statment->bindValue(':active',       1,           PDO::PARAM_INT);
+    $statment->bindValue(':status',      $data['status'],      PDO::PARAM_INT);
+    $statment->bindValue(':active',       1,                   PDO::PARAM_INT);
     $statment->execute();
 
     $json = $database->query('select @json')->fetchAll(PDO::FETCH_ASSOC)[0]['@json'];
@@ -106,6 +121,18 @@ function request_select()
 
         case 'POST' :
             $method = 'post';
+            if ( isset($_SERVER['CONTENT_TYPE']) )
+            {
+                if ( strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false )
+                {
+                    $parameters = json_decode(file_get_contents('php://input'), true);
+                    if (json_last_error() != JSON_ERROR_NONE)
+                    {
+                        http_response_code(402);
+                        throw new RequestException(406, 'Invalid JSON');                            
+                    }
+                }
+            }
             break;
 
         case 'PUT' :
@@ -131,12 +158,6 @@ function request_select()
         default :
             throw new Exception(405, 'Method \'' . $_SERVER['REQUEST_METHOD'] . '\' not supported');
             return;        
-      }
-
-      if ( ($method == 'post') && !isset($parameters['action']) )
-      {
-          throw new RequestException(406, 'Missing \'action\' in post \n' . $_SERVER['CONTENT_TYPE'] . print_r($parameters, true));
-          return;
       }
 
       if ( ($method == 'get')  )

@@ -6,8 +6,6 @@
             $(this).click(function() { TaskDialog('insert') })
         })
 
-        $('#task-dialog > div .modal-footer .btn-success').click(TaskDialogConfirmation)
-
         $(document).keydown(function (event) { 
             if (event.ctrlKey)
             {
@@ -68,6 +66,13 @@
         tag.data = item;
     }
 
+    function TaskDialogHandler(callback)
+    {
+        $('#task-dialog > div .modal-footer .btn-success').off('click')
+        $('#task-dialog > div .modal-footer .btn-success').click(callback)
+    }
+
+
     function TaskDialog(operation, target)
     {
         if (operation == 'update')
@@ -79,6 +84,7 @@
             $('#task-finish').val(target.data.finish)
             $('#task-status').val(target.data.status)
             $('#task-active').val(target.data.active)
+            TaskDialogHandler(function() { TaskUpdate(target) } )
         }
 
         if (operation == 'insert')
@@ -90,20 +96,55 @@
             $('#task-finish').val('')
             $('#task-status').val('')
             $('#task-active').val('')
+            TaskDialogHandler(TaskInsert)
         }
 
         $('#task-dialog').modal('show')
     }
 
-    function TaskDialogConfirmation()
+
+    function TaskUpdate(target)
     {
         var data
 
         data = {
-            name : $('#task-name').val(),
+            task_id     : target.data.task_id,
+            name        : $('#task-name').val(),
             description : $('#task-description').val(),
-            start : $('#task-start').val(),
-            finish : $('#task-finish').val(),
+            start       : $('#task-start').val(),
+            finish      : $('#task-finish').val(),
+            status      : $('#task-status').val(),
+            active      : $('#task-active').val()
+        }
+
+        $.ajax({
+            url         : 'tasks.php',
+            type        : 'POST',
+            data        :  JSON.stringify(data),
+            contentType : "application/json; charset=utf-8",
+            dataType    : "json"
+          })
+          .done(function (data) {
+              if (!data.success)         return
+              if (data.success !== true) return
+
+              location.reload()
+          })
+          .fail(function() { alert("ajax post error") })        
+    }
+
+
+    function TaskInsert()
+    {
+        var data
+
+        data = {
+            name        : $('#task-name').val(),
+            description : $('#task-description').val(),
+            start       : $('#task-start').val(),
+            finish      : $('#task-finish').val(),
+            status      : $('#task-status').val(),
+            active      : $('#task-active').val()            
         }
 
         $.ajax({
@@ -119,9 +160,9 @@
 
               TaskListAppendRecord(data.record, 20)
           })
-          .fail(function() { alert("ajax post error") })
-
+          .fail(function() { alert("ajax put error") })
     }
+
 
     function getData()
     {
