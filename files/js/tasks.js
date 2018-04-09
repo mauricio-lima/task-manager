@@ -26,6 +26,23 @@
         })
     }
 
+
+    function StatusList(data)
+    {
+        var template
+        var tag
+
+        template = $('#status-item').html()
+        data.forEach(function (item) {
+            tag = template
+            tag = tag.replace('{status_id}',    item.status_id)
+            tag = tag.replace('{status_name}',  item.name)
+            
+            $('#task-status').append(tag)
+        })
+    }
+
+
     function TaskListAppendRecord(item, index)
     {
         var template
@@ -107,6 +124,10 @@
         $.get('tasks.php')
            .done(UpdateData)
            .fail(function() { alert("ajax error") })
+
+        $.get('tasks.php?status')
+           .done(StatusList)
+           .fail(function() { alert("ajax error") })   
     }
  }
 )()

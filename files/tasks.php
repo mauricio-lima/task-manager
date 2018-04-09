@@ -22,6 +22,21 @@ function database_connection()
 }
 
 
+function status_list()
+{
+    $database = database_connection();
+
+    $statment = $database->prepare('call status_list', array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+    $statment->execute();
+
+    $result = $statment->fetchAll(PDO::FETCH_ASSOC);
+    $result = json_encode($result);
+
+    header('Content-type: application/json');
+    print($result);
+}
+
+
 function tasks_list()
 {
     $database = database_connection();
@@ -33,7 +48,7 @@ function tasks_list()
     $result = json_encode($result);
 
     header('Content-type: application/json');
-    print_r($result);
+    print($result);
 }
 
 
@@ -126,6 +141,12 @@ function request_select()
 
       if ( ($method == 'get')  )
       {
+        if ( isset($parameters['status']) )
+        {
+            status_list(); 
+            return;
+        }
+
         tasks_list();
         return;
       }

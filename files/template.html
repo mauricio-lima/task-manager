@@ -20,7 +20,10 @@
                     <div class="col-sm-6">
                         <button  type="button" class="btn btn-primary btn-sm btn-add">Adicionar</button>
                     </div>
-                </div>    
+                </div>
+                <template id="status-item">                
+                    <option value="{status_id}">{status_name}</option>
+                </template>    
                 <template id="task-row">                
                     <tr>
                         <th scope="row">{sequence}</th>
@@ -91,9 +94,6 @@
                                 </label>
                                 <select class="custom-select mb-2 mr-sm-2 mb-sm-0" id="task-status">
                                     <option selected>Status</option>
-                                    <option value="1">Um   </option>
-                                    <option value="2">Dois </option>
-                                    <option value="3">Três </option>
                                 </select>
                                 <label class="custom-control custom-checkbox mb-2 mr-sm-2 mb-sm-0">
                                     <input type="checkbox" class="custom-control-input" id="task-active">
