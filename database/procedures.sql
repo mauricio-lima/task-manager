@@ -72,3 +72,54 @@ main:BEGIN
 END;;
 DELIMITER ;
 
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `task_update`$$
+CREATE PROCEDURE `task_update`(IN update_task_id INT, IN update_name VARCHAR(255), IN update_description VARCHAR(600), IN update_start DATE, IN update_finish DATE, IN update_status INT, IN update_active INT, OUT update_json VARCHAR(1024) )
+main:BEGIN
+	IF DATE(update_start) = DATE(0) THEN
+		SET update_json = '{ "success" : false, "code" : 201, "message" : "Invalid start date"  }';
+		LEAVE main;
+	END IF;
+
+	IF DATE(update_finish) = DATE(0) THEN
+		SET update_json = '{ "success" : false, "code" : 202, "message" : "Invalid finish date" }';
+		LEAVE main;
+	END IF;
+
+	IF DATE(update_finish) < DATE(update_start) THEN
+		SET update_json = '{ "success" : false, "code" : 203, "message" : "Finish date is before start date" }';
+		LEAVE main;
+	END IF;
+		
+	UPDATE `tasks` SET          `name` = update_name,
+			     `description` = update_description,
+			           `start` = update_start,
+			          `finish` = update_finish,
+			       `status_id` = update_status,
+			          `active` = update_active		          			     
+	WHERE task_id = update_task_id;
+	
+	SET update_json = '{ "success" : true, 
+	                     "record"  : { 
+	                                  "task_id"     : $task_id$, 
+	                                  "name"        : "$name$", 
+	                                  "description" : "$description$",
+	                                  "start"       : "$start$",
+	                                  "finish"      : "$finish$",	                                    
+	                                  "status"      :  $status$, 
+	                                  "active"      :  $active$ 
+	                                 } 
+	                   }';
+	SET update_json = REPLACE(update_json COLLATE utf8_general_ci, '$task_id$',     update_task_id);
+	SET update_json = REPLACE(update_json COLLATE utf8_general_ci, '$name$',        update_name);
+	SET update_json = REPLACE(update_json COLLATE utf8_general_ci, '$description$', update_description);
+	SET update_json = REPLACE(update_json COLLATE utf8_general_ci, '$start$',       update_start);
+	SET update_json = REPLACE(update_json COLLATE utf8_general_ci, '$finish$',      update_finish);
+	SET update_json = REPLACE(update_json COLLATE utf8_general_ci, '$status$',      update_status);
+	SET update_json = REPLACE(update_json COLLATE utf8_general_ci, '$active$',      update_active);
+END$$
+DELIMITER ;
+
+
