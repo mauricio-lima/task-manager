@@ -63,7 +63,7 @@ function task_update($data)
     $statment->bindValue(':start',       $data['start'],       PDO::PARAM_STR);
     $statment->bindValue(':finish',      $data['finish'],      PDO::PARAM_STR);
     $statment->bindValue(':status',      $data['status'],      PDO::PARAM_INT);
-    $statment->bindValue(':active',       1,                   PDO::PARAM_INT);
+    $statment->bindValue(':active',      $data['active'],      PDO::PARAM_INT);
     $statment->execute();
 
     $json = $database->query('select @json')->fetchAll(PDO::FETCH_ASSOC)[0]['@json'];
@@ -83,7 +83,7 @@ function task_insert($data)
     $statment->bindValue(':start',       $data['start'],       PDO::PARAM_STR);
     $statment->bindValue(':finish',      $data['finish'],      PDO::PARAM_STR);
     $statment->bindValue(':status',      $data['status'],      PDO::PARAM_INT);
-    $statment->bindValue(':active',       1,                   PDO::PARAM_INT);
+    $statment->bindValue(':active',      $data['active'],      PDO::PARAM_INT);
     $statment->execute();
 
     $json = $database->query('select @json')->fetchAll(PDO::FETCH_ASSOC)[0]['@json'];

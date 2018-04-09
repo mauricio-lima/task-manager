@@ -114,7 +114,7 @@
             start       : $('#task-start').val(),
             finish      : $('#task-finish').val(),
             status      : $('#task-status').val(),
-            active      : $('#task-active').val()
+            active      : $('#task-active').prop('checked') == true ? 1 : 0
         }
 
         $.ajax({
