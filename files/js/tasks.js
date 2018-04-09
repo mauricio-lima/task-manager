@@ -2,7 +2,9 @@
  {
     $(function() {      
         getData()
-        $('#add').click(TasksAdd)
+        $('.btn-add' ).each(function(index) {
+            $(this).click(function() { TaskDialog('insert') })
+        })
 
         $('#task-dialog > div .modal-footer .btn-success').click(TaskDialogConfirmation)
 
@@ -37,13 +39,39 @@
         template = template.replace('{status}',      item.status)
         template = template.replace('{state}',       item.state)
 
-        $('.table tbody').append(template)
+        var x = $(template).appendTo($('.table tbody'))
+        
+        x.find('.btn-edit').click(function(e) { 
+            TaskDialog('update', x) 
+        })
+        x.data = item;
     }
 
-    function TasksAdd()
+    function TaskDialog(operation, target)
     {
-        $('#task-dialog').modal('show')
+        if (operation == 'update')
+        {
+            $('#task-dialog').find('.modal-title').html('Editar Tarefa')
+            $('#task-name').val(target.data.name)
+            $('#task-description').val(target.data.description)
+            $('#task-start').val(target.data.start)
+            $('#task-finish').val(target.data.finish)
+            $('#task-status').val(target.data.status)
+            $('#task-active').val(target.data.active)
+        }
 
+        if (operation == 'insert')
+        {
+            $('#task-dialog').find('.modal-title').html('Adicionar Tarefa')
+            $('#task-name').val('')
+            $('#task-description').val('')
+            $('#task-start').val('')
+            $('#task-finish').val('')
+            $('#task-status').val('')
+            $('#task-active').val('')
+        }
+
+        $('#task-dialog').modal('show')
     }
 
     function TaskDialogConfirmation()

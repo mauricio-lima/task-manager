@@ -6,7 +6,7 @@
         <link    href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
         <script   src="https://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI=" crossorigin="anonymous"></script>
         <script   src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-        <script   src="js/tasks.js?"></script>
+        <script   src="js/tasks.js"></script>
     </head>
     <body>
             <div class="container-fluid">
@@ -18,7 +18,7 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-6">
-                        <button id="add" type="button" class="btn btn-primary btn-sm">Adicionar</button>
+                        <button  type="button" class="btn btn-primary btn-sm btn-add">Adicionar</button>
                     </div>
                 </div>    
                 <template id="task-row">                
@@ -30,7 +30,7 @@
                         <td>{finish}     </td>
                         <td>{status}     </td>
                         <td>{state}      </td>
-                        <td><button type="button" class="btn btn-primary btn-rounded btn-sm my-0">Editar</button></td>
+                        <td><button type="button" class="btn btn-primary btn-rounded btn-sm btn-edit">Editar</button></td>
                     </tr>
                 </template>
                 <table class="table">
