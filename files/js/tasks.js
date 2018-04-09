@@ -45,23 +45,27 @@
 
     function TaskListAppendRecord(item, index)
     {
-        var template
+        var tag
 
-        template = $('#task-row').html()
-        template = template.replace('{sequence}',    index + 1)
-        template = template.replace('{name}',        item.name)
-        template = template.replace('{description}', item.description)
-        template = template.replace('{start}',       item.start)
-        template = template.replace('{finish}',      item.finish)
-        template = template.replace('{status}',      item.status)
-        template = template.replace('{state}',       item.state)
+        tag = $('#task-row').html()
+        tag = tag.replace('{sequence}',    index + 1)
+        tag = tag.replace('{name}',        item.name)
+        tag = tag.replace('{description}', item.description)
+        tag = tag.replace('{start}',       item.start)
+        tag = tag.replace('{finish}',      item.finish)
+        tag = tag.replace('{status}',      item.status)
+        tag = tag.replace('{state}',       item.state)
 
-        var x = $(template).appendTo($('.table tbody'))
-        
-        x.find('.btn-edit').click(function(e) { 
-            TaskDialog('update', x) 
+        tag = $(tag).appendTo($('.table tbody'))
+        if (item.status == "Concluído")
+        {
+            tag.css('background-color', 'cyan')
+        }
+
+        tag.find('.btn-edit').click(function(e) { 
+            TaskDialog('update', tag) 
         })
-        x.data = item;
+        tag.data = item;
     }
 
     function TaskDialog(operation, target)
