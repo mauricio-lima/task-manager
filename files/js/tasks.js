@@ -52,7 +52,7 @@
         tag = tag.replace('{start}',       item.start)
         tag = tag.replace('{finish}',      item.finish)
         tag = tag.replace('{status}',      item.status)
-        tag = tag.replace('{state}',       item.state)
+        tag = tag.replace('{state}',       item.state == 0 ? 'inativo' : 'ativo')
 
         tag = $(tag).appendTo($('.table tbody'))
         if (item.status == "Concluído")
@@ -148,11 +148,11 @@
         }
 
         $.ajax({
-            url:'tasks.php',
-            type:"PUT",
-            data: JSON.stringify(data),
-            contentType:"application/json; charset=utf-8",
-            dataType:"json"
+            url         : 'tasks.php',
+            type        : 'PUT',
+            data        :  JSON.stringify(data),
+            contentType : 'application/json; charset=utf-8',
+            dataType    : 'json'
           })
           .done(function (data) {
               if (!data.success)         return
