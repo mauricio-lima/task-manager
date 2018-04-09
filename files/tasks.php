@@ -22,7 +22,7 @@ function database_connection()
 }
 
 
-function get_tasks_data()
+function tasks_list()
 {
     $database = database_connection();
 
@@ -37,7 +37,13 @@ function get_tasks_data()
 }
 
 
-function insert_task_data($data)
+function task_update($data)
+{
+
+}
+
+
+function task_insert($data)
 {
     $database = database_connection();
 
@@ -57,6 +63,12 @@ function insert_task_data($data)
 }
 
 
+function task_delete($data)
+{
+
+}
+
+
 function normalize_parameters($source)
 {
     $parameters = array();
@@ -72,10 +84,19 @@ function request_select()
 {
       switch ($_SERVER['REQUEST_METHOD'])
       {
-          case 'POST' :
-              $method = 'post';
-              if ( isset($_SERVER['CONTENT_TYPE']) )
-              {
+        case 'GET'  :
+            $method = 'get';
+            $parameters = normalize_parameters($_GET);
+            break;
+
+        case 'POST' :
+            $method = 'post';
+            break;
+
+        case 'PUT' :
+            $method = 'put';
+            if ( isset($_SERVER['CONTENT_TYPE']) )
+            {
                 if ( strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false )
                 {
                     $parameters = json_decode(file_get_contents('php://input'), true);
@@ -85,17 +106,16 @@ function request_select()
                         throw new RequestException(406, 'Invalid JSON');                            
                     }
                 }
-              }
-              break;
+            }
+            break;
 
-          case 'GET'  :
-              $method = 'get';
-              $parameters = normalize_parameters($_GET);
-              break;
+        case 'DELETE' :
+            $method = 'delete';
+            break;
 
-          default :
-              throw new Exception(405, 'Method \'' . $_SERVER['REQUEST_METHOD'] . '\' not supported');
-              return;        
+        default :
+            throw new Exception(405, 'Method \'' . $_SERVER['REQUEST_METHOD'] . '\' not supported');
+            return;        
       }
 
       if ( ($method == 'post') && !isset($parameters['action']) )
@@ -106,21 +126,28 @@ function request_select()
 
       if ( ($method == 'get')  )
       {
-        get_tasks_data();
+        tasks_list();
         return;
       }
 
       if ( ($method == 'post')  )
       {
-        if ( $parameters['action'] == 'insert')
-        {
-            insert_task_data($parameters['data']);
-            return;
-        }
-
-        throw new RequestException(406, 'action ' . $parameters['action'] . ' not allowed.');
+        task_update($parameters);
         return;
       }
+
+      if ( ($method == 'put')  )
+      {
+        task_insert($parameters);
+        return;
+      }
+
+      if ( ($method == 'delete')  )
+      {
+        task_delete($parameters);
+        return;
+      }
+
 }
 
 

@@ -87,8 +87,8 @@
 
         $.ajax({
             url:'tasks.php',
-            type:"POST",
-            data: JSON.stringify({ action : "insert", data : data }),
+            type:"PUT",
+            data: JSON.stringify(data),
             contentType:"application/json; charset=utf-8",
             dataType:"json"
           })
