@@ -3,7 +3,7 @@ DROP PROCEDURE IF EXISTS `tasks_list`;;
 CREATE PROCEDURE `tasks_list`()
 BEGIN
 		SELECT 
-			task_id, `tasks`.name, description, `start`, `finish`, `status`.name AS `status`, `active` AS `state` 
+			task_id, `tasks`.name, description, `start`, `finish`, `status`.status_id AS status_id, `status`.name AS `status`, `active` AS `state` 
 		FROM 
 			`tasks`
 				LEFT JOIN 
