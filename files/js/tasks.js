@@ -82,7 +82,7 @@
             $('#task-description').val(target.data.description)
             $('#task-start').val(target.data.start)
             $('#task-finish').val(target.data.finish)
-            $('#task-status').val(target.data.status)
+            $('#task-status').val(target.data.status_id)
             $('#task-active').val(target.data.active)
             TaskDialogHandler(function() { TaskUpdate(target) } )
         }
